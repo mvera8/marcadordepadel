@@ -9,6 +9,8 @@ import {
   Group,
   Text,
   Title,
+	useComputedColorScheme,
+	useMantineColorScheme,
 } from "@mantine/core";
 import SpeechRecognition, {
   useSpeechRecognition,
@@ -16,17 +18,20 @@ import SpeechRecognition, {
 import {
   IconBallTennis,
   IconMicrophoneFilled,
+  IconMoon,
   IconPlayerStopFilled,
+	IconSun,
 } from "@tabler/icons-react";
 import { ScoreCard } from "../components/ScoreCard";
-
-import "./Home.module.css";
 
 const TENNIS_SCORES = [0, 15, 30, 40, "A"];
 const GAMES_TO_WIN_SET = 6;
 const DEUCE_SCORE = 3;
 
 export const HomePage = () => {
+	const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+
   const [gameState, setGameState] = useState({
     gameStarted: false,
     lastWinner: "",
@@ -135,7 +140,7 @@ export const HomePage = () => {
   if (!gameStarted) {
     return (
       <Container>
-        <Title c="white" order={1} ta="center" my="xl">
+        <Title order={1} ta="center" my="xl">
           Marcador de Padel
         </Title>
         {lastWinner && (
@@ -144,7 +149,7 @@ export const HomePage = () => {
           </Title>
         )}
         <Container size="xs">
-          <Text c="white" ta="center" mb="md">
+          <Text ta="center" mb="md">
             Comenzar Juego?
           </Text>
           <Button
@@ -166,23 +171,24 @@ export const HomePage = () => {
   }
 
   return (
-    <Container>
-      <Flex justify="flex-end" align="center" pb={0}>
-        Comando por Voz
-        <ActionIcon
-          ml="xs"
-          variant="subtle"
-          color={listening ? "red" : "white"}
-          aria-label="Listen"
-          size="lg"
-          onClick={handleStartListen}
-        >
-          {listening ? (
-            <IconPlayerStopFilled size={15} stroke={1.5} />
-          ) : (
-            <IconMicrophoneFilled size={15} stroke={1.5} />
-          )}
-        </ActionIcon>
+    <Container py="xs">
+      <Flex justify="flex-end" align="center" pb="sm">
+				<Button
+        variant="subtle"
+				color='gray'
+				onClick={handleStartListen}
+        rightSection={listening ? (<IconPlayerStopFilled size={15} stroke={1.5} />) : (<IconMicrophoneFilled size={15} stroke={1.5} />)}>
+					Comando por Voz
+				</Button>
+				<ActionIcon
+						ml="xs"
+						variant="subtle"
+						aria-label="Listen"
+						color='gray'
+						size="lg"
+						onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}>
+						{computedColorScheme === 'light' ? <IconMoon size={20} /> : <IconSun size={20} />}
+					</ActionIcon>
       </Flex>
 
       <Grid mb="md">
@@ -210,7 +216,8 @@ export const HomePage = () => {
             Reset
           </Button>
           <Button
-            variant="default"
+            variant="light"
+						color="red"
             onClick={() => handleGameFinished("Finalizado")}
           >
             Finalizar
