@@ -150,12 +150,14 @@ export const HomePage = () => {
           <Button
             fullWidth
             rightSection={<IconBallTennis size={20} />}
-            variant="white"
-            color="gray"
+            variant="filled"
+            color="yellow"
             radius="xl"
             size="lg"
             onClick={handleGameStart}
-          >
+						style={{
+							boxShadow: 'rgba(0, 0, 0, 0.2) 2px 2px 2px 0'
+						}}>
             Empezar
           </Button>
         </Container>
