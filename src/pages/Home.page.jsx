@@ -16,6 +16,8 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import {
+	IconArrowsMaximize,
+  IconArrowsMinimize,
   IconBallTennis,
   IconMicrophoneFilled,
   IconMoon,
@@ -23,6 +25,7 @@ import {
 	IconSun,
 } from "@tabler/icons-react";
 import { ScoreCard } from "../components/ScoreCard";
+import { useFullscreen } from "@mantine/hooks";
 
 const TENNIS_SCORES = [0, 15, 30, 40, "A"];
 const GAMES_TO_WIN_SET = 6;
@@ -31,6 +34,8 @@ const DEUCE_SCORE = 3;
 export const HomePage = () => {
 	const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+
+	const { toggle, fullscreen } = useFullscreen();
 
   const [gameState, setGameState] = useState({
     gameStarted: false,
@@ -177,18 +182,27 @@ export const HomePage = () => {
         variant="subtle"
 				color='gray'
 				onClick={handleStartListen}
-        rightSection={listening ? (<IconPlayerStopFilled size={15} stroke={1.5} />) : (<IconMicrophoneFilled size={15} stroke={1.5} />)}>
+        rightSection={listening ? (<IconPlayerStopFilled size={20} />) : (<IconMicrophoneFilled size={20} />)}>
 					Comando por Voz
 				</Button>
 				<ActionIcon
-						ml="xs"
-						variant="subtle"
-						aria-label="Listen"
-						color='gray'
-						size="lg"
-						onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}>
-						{computedColorScheme === 'light' ? <IconMoon size={20} /> : <IconSun size={20} />}
-					</ActionIcon>
+					ml="xs"
+					variant="subtle"
+					aria-label="Listen"
+					color='gray'
+					size="lg"
+					onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}>
+					{computedColorScheme === 'light' ? <IconMoon size={20} /> : <IconSun size={20} />}
+				</ActionIcon>
+				<ActionIcon
+					ml="xs"
+					variant="subtle"
+					aria-label="Listen"
+					color='gray'
+					size="lg"
+					onClick={toggle}>
+					{fullscreen ? <IconArrowsMinimize size={20} /> : <IconArrowsMaximize size={20} />}
+				</ActionIcon>
       </Flex>
 
       <Grid mb="md">
