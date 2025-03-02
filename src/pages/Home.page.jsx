@@ -26,6 +26,9 @@ import {
 } from "@tabler/icons-react";
 import { ScoreCard } from "../components/ScoreCard";
 import { useFullscreen } from "@mantine/hooks";
+import BluetoothConnect from "../components/BluetoothConnect";
+
+// cb37cbc5-fddf-472d-b05d-8f30c2abbfa4
 
 const TENNIS_SCORES = [0, 15, 30, 40, "A"];
 const GAMES_TO_WIN_SET = 6;
@@ -145,6 +148,9 @@ export const HomePage = () => {
   if (!gameStarted) {
     return (
       <Container>
+
+				<BluetoothConnect />
+
         <Title order={1} ta="center" my="xl">
           Marcador de Padel
         </Title>
