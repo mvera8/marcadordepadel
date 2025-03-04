@@ -9,13 +9,13 @@ export const ScoreCard = ({ title, set, point, onPointScored }) => {
         className={classes.redButton}
         onClick={onPointScored} // Use the passed function
       >
-        <Title order={2} ta="center" mb={0}>
+        <Title order={3} ta="center" mb={0}>
           {title}
         </Title>
-        <Title order={3} ta="center" mb={0}>
+        <Title order={2} ta="center" mb={-25}>
           Set: {set}
         </Title>
-        <Title order={1} ta="center" size={80} fw={700}>
+        <Title order={1} ta="center" size={150} fw={700}>
           {point}
         </Title>
       </UnstyledButton>

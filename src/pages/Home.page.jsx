@@ -22,11 +22,11 @@ import {
   IconMicrophoneFilled,
   IconMoon,
   IconPlayerStopFilled,
+	IconRestore,
 	IconSun,
 } from "@tabler/icons-react";
 import { ScoreCard } from "../components/ScoreCard";
 import { useFullscreen } from "@mantine/hooks";
-import BluetoothConnect from "../components/BluetoothConnect";
 
 // cb37cbc5-fddf-472d-b05d-8f30c2abbfa4
 
@@ -148,9 +148,6 @@ export const HomePage = () => {
   if (!gameStarted) {
     return (
       <Container>
-
-				<BluetoothConnect />
-
         <Title order={1} ta="center" my="xl">
           Marcador de Padel
         </Title>
@@ -183,7 +180,7 @@ export const HomePage = () => {
 
   return (
     <Container py="xs">
-      <Flex justify="flex-end" align="center" pb="sm">
+      <Flex justify="flex-end" align="center" pb="xs">
 				<Button
         variant="subtle"
 				color='gray'
@@ -232,7 +229,10 @@ export const HomePage = () => {
 
       <Flex justify="center">
         <Group>
-          <Button variant="default" onClick={handleGameRestart}>
+          <Button
+						leftSection={<IconRestore size={15} />}
+						variant="default"
+						onClick={handleGameRestart}>
             Reset
           </Button>
           <Button
