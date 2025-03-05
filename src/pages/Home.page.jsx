@@ -1,5 +1,5 @@
 import "regenerator-runtime/runtime";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   ActionIcon,
   Button,
@@ -9,24 +9,25 @@ import {
   Group,
   Text,
   Title,
-	useComputedColorScheme,
-	useMantineColorScheme,
+  useComputedColorScheme,
+  useMantineColorScheme,
 } from "@mantine/core";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import {
-	IconArrowsMaximize,
+  IconArrowsMaximize,
   IconArrowsMinimize,
   IconBallTennis,
   IconMicrophoneFilled,
   IconMoon,
   IconPlayerStopFilled,
-	IconRestore,
-	IconSun,
+  IconRestore,
+  IconSun,
 } from "@tabler/icons-react";
 import { ScoreCard } from "../components/ScoreCard";
 import { useFullscreen } from "@mantine/hooks";
+import Chronometer from "../components/Chronometer";
 
 // cb37cbc5-fddf-472d-b05d-8f30c2abbfa4
 
@@ -35,10 +36,12 @@ const GAMES_TO_WIN_SET = 6;
 const DEUCE_SCORE = 3;
 
 export const HomePage = () => {
-	const { setColorScheme } = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
 
-	const { toggle, fullscreen } = useFullscreen();
+  const { toggle, fullscreen } = useFullscreen();
 
   const [gameState, setGameState] = useState({
     gameStarted: false,
@@ -49,6 +52,14 @@ export const HomePage = () => {
 
   const { gameStarted, lastWinner, sets, points } = gameState;
   const { transcript, listening, resetTranscript } = useSpeechRecognition();
+
+  const chronoRef = useRef();
+
+  useEffect(() => {
+    if (gameState.gameStarted && chronoRef.current) {
+      chronoRef.current.start();
+    }
+  }, [gameState.gameStarted]);
 
   useEffect(() => {
     if (!gameStarted) return;
@@ -123,6 +134,14 @@ export const HomePage = () => {
       sets: { red: 0, blue: 0 },
       points: { red: 0, blue: 0 },
     }));
+
+    // Ensure chronoRef.current exists before calling reset()
+    if (chronoRef.current) {
+      chronoRef.current.reset();
+			chronoRef.current.start();
+    } else {
+      console.warn("Chronometer is not ready yet!"); // Debugging tip
+    }
   };
 
   const handleGameFinished = (winner) => {
@@ -168,9 +187,10 @@ export const HomePage = () => {
             radius="xl"
             size="lg"
             onClick={handleGameStart}
-						style={{
-							boxShadow: 'rgba(0, 0, 0, 0.2) 2px 2px 2px 0'
-						}}>
+            style={{
+              boxShadow: "rgba(0, 0, 0, 0.2) 2px 2px 2px 0",
+            }}
+          >
             Empezar
           </Button>
         </Container>
@@ -181,31 +201,50 @@ export const HomePage = () => {
   return (
     <Container py="xs">
       <Flex justify="flex-end" align="center" pb="xs">
-				<Button
-        variant="subtle"
-				color='gray'
-				onClick={handleStartListen}
-        rightSection={listening ? (<IconPlayerStopFilled size={20} />) : (<IconMicrophoneFilled size={20} />)}>
-					Comando por Voz
-				</Button>
-				<ActionIcon
-					ml="xs"
-					variant="subtle"
-					aria-label="Listen"
-					color='gray'
-					size="lg"
-					onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}>
-					{computedColorScheme === 'light' ? <IconMoon size={20} /> : <IconSun size={20} />}
-				</ActionIcon>
-				<ActionIcon
-					ml="xs"
-					variant="subtle"
-					aria-label="Listen"
-					color='gray'
-					size="lg"
-					onClick={toggle}>
-					{fullscreen ? <IconArrowsMinimize size={20} /> : <IconArrowsMaximize size={20} />}
-				</ActionIcon>
+        <Button
+          variant="subtle"
+          color="gray"
+          onClick={handleStartListen}
+          rightSection={
+            listening ? (
+              <IconPlayerStopFilled size={20} />
+            ) : (
+              <IconMicrophoneFilled size={20} />
+            )
+          }
+        >
+          Comando por Voz
+        </Button>
+        <ActionIcon
+          ml="xs"
+          variant="subtle"
+          aria-label="Listen"
+          color="gray"
+          size="lg"
+          onClick={() =>
+            setColorScheme(computedColorScheme === "light" ? "dark" : "light")
+          }
+        >
+          {computedColorScheme === "light" ? (
+            <IconMoon size={20} />
+          ) : (
+            <IconSun size={20} />
+          )}
+        </ActionIcon>
+        <ActionIcon
+          ml="xs"
+          variant="subtle"
+          aria-label="Listen"
+          color="gray"
+          size="lg"
+          onClick={toggle}
+        >
+          {fullscreen ? (
+            <IconArrowsMinimize size={20} />
+          ) : (
+            <IconArrowsMaximize size={20} />
+          )}
+        </ActionIcon>
       </Flex>
 
       <Grid mb="md">
@@ -229,15 +268,17 @@ export const HomePage = () => {
 
       <Flex justify="center">
         <Group>
+          <Chronometer ref={chronoRef} />
           <Button
-						leftSection={<IconRestore size={15} />}
-						variant="default"
-						onClick={handleGameRestart}>
+            leftSection={<IconRestore size={15} />}
+            variant="default"
+            onClick={handleGameRestart}
+          >
             Reset
           </Button>
           <Button
             variant="light"
-						color="red"
+            color="red"
             onClick={() => handleGameFinished("Finalizado")}
           >
             Finalizar
