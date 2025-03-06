@@ -176,20 +176,7 @@ export const HomePage = () => {
         {lastWinner && (
 					<>
 						<Title order={2} ta="center" c="dimmed">
-							Último ganador: {lastWinner}
-
-							<ActionIcon
-								variant="light"
-								color="green"
-								size="lg"
-								radius="xl"
-								aria-label="WhatsApp"
-								component="a"
-								href={`https://wa.me/?text=${encodeURIComponent(`🏆 Último ganador: ${lastWinner}`)}`}
-								target="_blank"
-								ml="md">
-								<IconBrandWhatsapp style={{ width: '70%', height: '70%' }} stroke={1.5} />
-							</ActionIcon>
+							🏆 Último ganador: {lastWinner}
 
 							<ActionIcon
 								variant="light"
