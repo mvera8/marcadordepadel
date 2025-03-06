@@ -7,6 +7,7 @@ import {
   Flex,
   Grid,
   Group,
+  Input,
   Text,
   Title,
   useComputedColorScheme,
@@ -19,6 +20,7 @@ import {
   IconArrowsMaximize,
   IconArrowsMinimize,
   IconBallTennis,
+  IconBrandWhatsapp,
   IconMicrophoneFilled,
   IconMoon,
   IconPlayerStopFilled,
@@ -28,8 +30,6 @@ import {
 import { ScoreCard } from "../components/ScoreCard";
 import { useFullscreen } from "@mantine/hooks";
 import Chronometer from "../components/Chronometer";
-
-// cb37cbc5-fddf-472d-b05d-8f30c2abbfa4
 
 const TENNIS_SCORES = [0, 15, 30, 40, "A"];
 const GAMES_TO_WIN_SET = 6;
@@ -54,6 +54,9 @@ export const HomePage = () => {
   const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
   const chronoRef = useRef();
+
+	const [nosotros, setNosotros] = useState('');
+	const [ellos, setEllos] = useState('');
 
   useEffect(() => {
     if (gameState.gameStarted && chronoRef.current) {
@@ -107,14 +110,13 @@ export const HomePage = () => {
         newState.points[player] += 1;
       }
       if (newState.sets[player] >= GAMES_TO_WIN_SET) {
-        return {
-          ...newState,
-          gameStarted: false,
-          lastWinner: `${
-            player.charAt(0).toUpperCase() + player.slice(1)
-          } Wins`,
-        };
-      }
+				const finalScore = `${sets.red}-${sets.blue}`;
+				return {
+					...newState,
+					gameStarted: false,
+					lastWinner: (player === "red" ? nosotros || "Nosotros" : ellos || "Ellos") + ' ' + finalScore,
+				};
+			}
       return newState;
     });
   };
@@ -145,12 +147,13 @@ export const HomePage = () => {
   };
 
   const handleGameFinished = (winner) => {
-    setGameState((prev) => ({
-      ...prev,
-      gameStarted: false,
-      lastWinner: winner,
-    }));
-  };
+		console.log('winner', winner);
+		setGameState((prev) => ({
+			...prev,
+			gameStarted: false,
+			lastWinner: winner === "Finalizado" ? "Finalizado" : (winner === "red" ? (nosotros || "Nosotros") : (ellos || "Ellos")),
+		}));
+	};
 
   const handleStartListen = () => {
     if (listening) {
@@ -171,11 +174,54 @@ export const HomePage = () => {
           Marcador de Padel
         </Title>
         {lastWinner && (
-          <Title order={2} ta="center" c="dimmed">
-            Último ganador: {lastWinner}
-          </Title>
+					<>
+						<Title order={2} ta="center" c="dimmed">
+							Último ganador: {lastWinner}
+
+							<ActionIcon
+								variant="light"
+								color="green"
+								size="lg"
+								radius="xl"
+								aria-label="WhatsApp"
+								component="a"
+								href={`https://wa.me/?text=${encodeURIComponent(`🏆 Último ganador: ${lastWinner}`)}`}
+								target="_blank"
+								ml="md">
+								<IconBrandWhatsapp style={{ width: '70%', height: '70%' }} stroke={1.5} />
+							</ActionIcon>
+
+							<ActionIcon
+								variant="light"
+								color="green"
+								size="lg"
+								radius="xl"
+								aria-label="WhatsApp"
+								component="a"
+								href={`https://api.whatsapp.com/send/?text=${encodeURIComponent(`🏆 Último ganador: ${lastWinner}`)}`}
+								target="_blank"
+								ml="md">
+								<IconBrandWhatsapp style={{ width: '70%', height: '70%' }} stroke={1.5} />
+							</ActionIcon>
+						</Title>
+					</>
         )}
         <Container size="xs">
+
+					<Input.Wrapper label="Nosotros" mb="md">
+						<Input
+							onChange={(event) => setNosotros(event.currentTarget.value)}
+							value={nosotros}
+						/>
+					</Input.Wrapper>
+
+					<Input.Wrapper label="Ellos" mb="md">
+						<Input
+							onChange={(event) => setEllos(event.currentTarget.value)}
+							value={ellos}
+						/>
+					</Input.Wrapper>
+
           <Text ta="center" mb="md">
             Comenzar Juego?
           </Text>
@@ -250,7 +296,7 @@ export const HomePage = () => {
       <Grid mb="md">
         <Grid.Col span={6}>
           <ScoreCard
-            title="Nosotros"
+            title={nosotros ? nosotros : 'Nosotros'}
             set={sets.red}
             point={TENNIS_SCORES[points.red]}
             onPointScored={() => handlePointScored("red")}
@@ -258,7 +304,7 @@ export const HomePage = () => {
         </Grid.Col>
         <Grid.Col span={6}>
           <ScoreCard
-            title="Ellos"
+            title={ellos ? ellos : 'Ellos'}
             set={sets.blue}
             point={TENNIS_SCORES[points.blue]}
             onPointScored={() => handlePointScored("blue")}
