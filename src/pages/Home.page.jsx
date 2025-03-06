@@ -17,6 +17,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import {
+  IconArrowBackUpDouble,
   IconArrowsMaximize,
   IconArrowsMinimize,
   IconBallTennis,
@@ -43,6 +44,7 @@ export const HomePage = () => {
 
   const { toggle, fullscreen } = useFullscreen();
 
+  const [history, setHistory] = useState([]);
   const [gameState, setGameState] = useState({
     gameStarted: false,
     lastWinner: "",
@@ -55,8 +57,8 @@ export const HomePage = () => {
 
   const chronoRef = useRef();
 
-	const [nosotros, setNosotros] = useState('');
-	const [ellos, setEllos] = useState('');
+  const [nosotros, setNosotros] = useState("");
+  const [ellos, setEllos] = useState("");
 
   useEffect(() => {
     if (gameState.gameStarted && chronoRef.current) {
@@ -67,7 +69,7 @@ export const HomePage = () => {
   useEffect(() => {
     if (!gameStarted) return;
     const transcriptLower = transcript.toLowerCase();
-    console.log("transcription:", transcriptLower);
+    // console.log("transcription:", transcriptLower);
 
     if (transcriptLower.includes("nosotros")) {
       handlePointScored("red");
@@ -88,8 +90,10 @@ export const HomePage = () => {
   }, [transcript, gameStarted]);
 
   const handlePointScored = (player) => {
-    const opponent = player === "red" ? "blue" : "red";
+    setHistory((prevHistory) => [...prevHistory, structuredClone(gameState)]); // Guardar copia profunda
+
     setGameState((prevState) => {
+      const opponent = player === "red" ? "blue" : "red";
       const newState = { ...prevState };
       const playerPoints = prevState.points[player];
       const opponentPoints = prevState.points[opponent];
@@ -110,14 +114,30 @@ export const HomePage = () => {
         newState.points[player] += 1;
       }
       if (newState.sets[player] >= GAMES_TO_WIN_SET) {
-				const finalScore = `${sets.red}-${sets.blue}`;
-				return {
-					...newState,
-					gameStarted: false,
-					lastWinner: (player === "red" ? nosotros || "Nosotros" : ellos || "Ellos") + ' ' + finalScore,
-				};
-			}
+        const finalScore = `${sets.red}-${sets.blue}`;
+        return {
+          ...newState,
+          gameStarted: false,
+          lastWinner:
+            (player === "red" ? nosotros || "Nosotros" : ellos || "Ellos") +
+            " " +
+            finalScore,
+        };
+      }
       return newState;
+    });
+  };
+
+  const handleStepBack = () => {
+    setHistory((prevHistory) => {
+      if (prevHistory.length === 0) return prevHistory;
+
+      const previousState = structuredClone(
+        prevHistory[prevHistory.length - 1]
+      ); // Restaurar copia profunda
+      setGameState(previousState); // Forzar actualización
+
+      return prevHistory.slice(0, -1); // Eliminar el último estado guardado
     });
   };
 
@@ -140,20 +160,24 @@ export const HomePage = () => {
     // Ensure chronoRef.current exists before calling reset()
     if (chronoRef.current) {
       chronoRef.current.reset();
-			chronoRef.current.start();
+      chronoRef.current.start();
     } else {
       console.warn("Chronometer is not ready yet!"); // Debugging tip
     }
   };
 
   const handleGameFinished = (winner) => {
-		console.log('winner', winner);
-		setGameState((prev) => ({
-			...prev,
-			gameStarted: false,
-			lastWinner: winner === "Finalizado" ? "Finalizado" : (winner === "red" ? (nosotros || "Nosotros") : (ellos || "Ellos")),
-		}));
-	};
+    setGameState((prev) => ({
+      ...prev,
+      gameStarted: false,
+      lastWinner:
+        winner === "Finalizado"
+          ? "Finalizado"
+          : winner === "red"
+          ? nosotros || "Nosotros"
+          : ellos || "Ellos",
+    }));
+  };
 
   const handleStartListen = () => {
     if (listening) {
@@ -174,40 +198,44 @@ export const HomePage = () => {
           Marcador de Padel
         </Title>
         {lastWinner && (
-					<>
-						<Title order={2} ta="center" c="dimmed">
-							🏆 Último ganador: {lastWinner}
-
-							<ActionIcon
-								variant="light"
-								color="green"
-								size="lg"
-								radius="xl"
-								aria-label="WhatsApp"
-								component="a"
-								href={`https://api.whatsapp.com/send/?text=${encodeURIComponent(`🏆 Último ganador: ${lastWinner}`)}`}
-								target="_blank"
-								ml="md">
-								<IconBrandWhatsapp style={{ width: '70%', height: '70%' }} stroke={1.5} />
-							</ActionIcon>
-						</Title>
-					</>
+          <>
+            <Title order={2} ta="center" c="dimmed">
+              🏆 Último ganador: {lastWinner}
+              <ActionIcon
+                variant="light"
+                color="green"
+                size="lg"
+                radius="xl"
+                aria-label="WhatsApp"
+                component="a"
+                href={`https://api.whatsapp.com/send/?text=${encodeURIComponent(
+                  `🏆 Último ganador: ${lastWinner}`
+                )}`}
+                target="_blank"
+                ml="md"
+              >
+                <IconBrandWhatsapp
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Title>
+          </>
         )}
         <Container size="xs">
+          <Input.Wrapper label="Nosotros" mb="md">
+            <Input
+              onChange={(event) => setNosotros(event.currentTarget.value)}
+              value={nosotros}
+            />
+          </Input.Wrapper>
 
-					<Input.Wrapper label="Nosotros" mb="md">
-						<Input
-							onChange={(event) => setNosotros(event.currentTarget.value)}
-							value={nosotros}
-						/>
-					</Input.Wrapper>
-
-					<Input.Wrapper label="Ellos" mb="md">
-						<Input
-							onChange={(event) => setEllos(event.currentTarget.value)}
-							value={ellos}
-						/>
-					</Input.Wrapper>
+          <Input.Wrapper label="Ellos" mb="md">
+            <Input
+              onChange={(event) => setEllos(event.currentTarget.value)}
+              value={ellos}
+            />
+          </Input.Wrapper>
 
           <Text ta="center" mb="md">
             Comenzar Juego?
@@ -283,7 +311,7 @@ export const HomePage = () => {
       <Grid mb="md">
         <Grid.Col span={6}>
           <ScoreCard
-            title={nosotros ? nosotros : 'Nosotros'}
+            title={nosotros ? nosotros : "Nosotros"}
             set={sets.red}
             point={TENNIS_SCORES[points.red]}
             onPointScored={() => handlePointScored("red")}
@@ -291,7 +319,7 @@ export const HomePage = () => {
         </Grid.Col>
         <Grid.Col span={6}>
           <ScoreCard
-            title={ellos ? ellos : 'Ellos'}
+            title={ellos ? ellos : "Ellos"}
             set={sets.blue}
             point={TENNIS_SCORES[points.blue]}
             onPointScored={() => handlePointScored("blue")}
@@ -308,6 +336,13 @@ export const HomePage = () => {
             onClick={handleGameRestart}
           >
             Reset
+          </Button>
+          <Button
+            leftSection={<IconArrowBackUpDouble size={15} />}
+            variant="default"
+            onClick={handleStepBack}
+          >
+            Atras
           </Button>
           <Button
             variant="light"
