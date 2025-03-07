@@ -1,4 +1,5 @@
-// cypress/e2e/test_match.cy.js
+
+// npm run cy:run:test_match
 
 function fillField(FIELD, TEXT) {
   cy.get(FIELD)
