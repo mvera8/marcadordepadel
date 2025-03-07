@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:run:test_match": "cypress run --spec 'cypress/e2e/test_match.cy.js' --config video=false"
+    "cy:run:test_match": "cypress run --spec 'cypress/e2e/test_match.cy.js' --config video=false",
+    "prepare": "husky"
   },
   "dependencies": {
     "@mantine/core": "^7.10.1",
