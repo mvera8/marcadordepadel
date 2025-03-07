@@ -29,7 +29,7 @@ import {
   IconSun,
 } from "@tabler/icons-react";
 import { ScoreCard } from "../components/ScoreCard";
-import { useFullscreen } from "@mantine/hooks";
+import { useFullscreen, useMediaQuery } from "@mantine/hooks";
 import Chronometer from "../components/Chronometer";
 
 const TENNIS_SCORES = [0, 15, 30, 40, "A"];
@@ -37,6 +37,7 @@ const GAMES_TO_WIN_SET = 6;
 const DEUCE_SCORE = 3;
 
 export const HomePage = () => {
+	const matches = useMediaQuery('(min-width: 56.25em)');
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -69,7 +70,7 @@ export const HomePage = () => {
   useEffect(() => {
     if (!gameStarted) return;
     const transcriptLower = transcript.toLowerCase();
-    // console.log("transcription:", transcriptLower);
+    console.log("transcription:", transcriptLower);
 
     if (transcriptLower.includes("nosotros")) {
       handlePointScored("red");
@@ -83,8 +84,12 @@ export const HomePage = () => {
       handleGameRestart();
       resetTranscript();
     }
-    if (transcriptLower.includes("fin")) {
+    if (transcriptLower.includes("fin") || transcriptLower.includes("end")) {
       handleGameFinished("No Winner");
+      resetTranscript();
+    }
+		if (transcriptLower.includes("atras") || transcriptLower.includes("atrás") || transcriptLower.includes("back")) {
+      handleStepBack();
       resetTranscript();
     }
   }, [transcript, gameStarted]);
@@ -312,6 +317,7 @@ export const HomePage = () => {
         <Grid.Col span={6}>
           <ScoreCard
             title={nosotros ? nosotros : "Nosotros"}
+						commandVoice="Nosotros"
             set={sets.red}
             point={TENNIS_SCORES[points.red]}
             onPointScored={() => handlePointScored("red")}
@@ -320,6 +326,7 @@ export const HomePage = () => {
         <Grid.Col span={6}>
           <ScoreCard
             title={ellos ? ellos : "Ellos"}
+						commandVoice="Ellos"
             set={sets.blue}
             point={TENNIS_SCORES[points.blue]}
             onPointScored={() => handlePointScored("blue")}
@@ -327,32 +334,35 @@ export const HomePage = () => {
         </Grid.Col>
       </Grid>
 
-      <Flex justify="center">
-        <Group>
-          <Chronometer ref={chronoRef} />
-          <Button
-            leftSection={<IconRestore size={15} />}
-            variant="default"
-            onClick={handleGameRestart}
-          >
-            Reset
-          </Button>
-          <Button
-            leftSection={<IconArrowBackUpDouble size={15} />}
-            variant="default"
-            onClick={handleStepBack}
-          >
-            Atras
-          </Button>
-          <Button
-            variant="light"
-            color="red"
-            onClick={() => handleGameFinished("Finalizado")}
-          >
-            Finalizar
-          </Button>
-        </Group>
-      </Flex>
+			<Grid>
+				<Grid.Col span={{ base: 12, md: 4 }}>
+					<Group justify={matches ? 'flex-start' : 'center'}>
+						<Chronometer ref={chronoRef} />
+					</Group>
+				</Grid.Col>
+				<Grid.Col span={{ base: 12, md: 8 }}>
+					<Group justify={matches ? 'flex-end' : 'center'}>
+						<Button
+							leftSection={<IconArrowBackUpDouble size={15} />}
+							variant="default"
+							onClick={handleStepBack}>
+							Atras
+						</Button>
+						<Button
+							leftSection={<IconRestore size={15} />}
+							variant="default"
+							onClick={handleGameRestart}>
+							Reset
+						</Button>
+						<Button
+							variant="light"
+							color="red"
+							onClick={() => handleGameFinished("Finalizado")}>
+							Finalizar
+						</Button>
+					</Group>
+				</Grid.Col>
+			</Grid>
     </Container>
   );
 };
