@@ -37,7 +37,7 @@ const GAMES_TO_WIN_SET = 6;
 const DEUCE_SCORE = 3;
 
 export const HomePage = () => {
-	const matches = useMediaQuery('(min-width: 56.25em)');
+	const matches = useMediaQuery('(min-width: 575px)');
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -335,12 +335,12 @@ export const HomePage = () => {
       </Grid>
 
 			<Grid>
-				<Grid.Col span={{ base: 12, sm: 4 }}>
+				<Grid.Col span={{ base: 12, xs: 4 }}>
 					<Group justify={matches ? 'flex-start' : 'center'}>
 						<Chronometer ref={chronoRef} />
 					</Group>
 				</Grid.Col>
-				<Grid.Col span={{ base: 12, sm: 8 }}>
+				<Grid.Col span={{ base: 12, xs: 8 }}>
 					<Group justify={matches ? 'flex-end' : 'center'}>
 						<Button
 							leftSection={<IconArrowBackUpDouble size={15} />}
