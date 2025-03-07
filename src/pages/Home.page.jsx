@@ -316,7 +316,7 @@ export const HomePage = () => {
       <Grid mb="md">
         <Grid.Col span={6}>
           <ScoreCard
-            title={nosotros ? nosotros : "Nosotros"}
+            title={nosotros}
 						commandVoice="Nosotros"
             set={sets.red}
             point={TENNIS_SCORES[points.red]}
@@ -325,7 +325,7 @@ export const HomePage = () => {
         </Grid.Col>
         <Grid.Col span={6}>
           <ScoreCard
-            title={ellos ? ellos : "Ellos"}
+            title={ellos}
 						commandVoice="Ellos"
             set={sets.blue}
             point={TENNIS_SCORES[points.blue]}
@@ -335,12 +335,12 @@ export const HomePage = () => {
       </Grid>
 
 			<Grid>
-				<Grid.Col span={{ base: 12, md: 4 }}>
+				<Grid.Col span={{ base: 12, sm: 4 }}>
 					<Group justify={matches ? 'flex-start' : 'center'}>
 						<Chronometer ref={chronoRef} />
 					</Group>
 				</Grid.Col>
-				<Grid.Col span={{ base: 12, md: 8 }}>
+				<Grid.Col span={{ base: 12, sm: 8 }}>
 					<Group justify={matches ? 'flex-end' : 'center'}>
 						<Button
 							leftSection={<IconArrowBackUpDouble size={15} />}
