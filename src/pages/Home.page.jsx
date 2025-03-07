@@ -228,14 +228,14 @@ export const HomePage = () => {
           </>
         )}
         <Container size="xs">
-          <Input.Wrapper label="Nosotros" mb="md">
+          <Input.Wrapper label="Nosotros" mb="md" id="input_nosotros">
             <Input
               onChange={(event) => setNosotros(event.currentTarget.value)}
               value={nosotros}
             />
           </Input.Wrapper>
 
-          <Input.Wrapper label="Ellos" mb="md">
+          <Input.Wrapper label="Ellos" mb="md" id="input_ellos">
             <Input
               onChange={(event) => setEllos(event.currentTarget.value)}
               value={ellos}
