@@ -31,13 +31,18 @@ import {
 import { ScoreCard } from "../components/ScoreCard";
 import { useFullscreen, useMediaQuery } from "@mantine/hooks";
 import Chronometer from "../components/Chronometer";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = "https://qlrvithbzdncfhvjulgx.supabase.co";
+const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const TENNIS_SCORES = [0, 15, 30, 40, "A"];
 const GAMES_TO_WIN_SET = 6;
 const DEUCE_SCORE = 3;
 
 export const HomePage = () => {
-	const matches = useMediaQuery('(min-width: 575px)');
+  const matches = useMediaQuery("(min-width: 575px)");
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -88,14 +93,18 @@ export const HomePage = () => {
       handleGameFinished("No Winner");
       resetTranscript();
     }
-		if (transcriptLower.includes("atras") || transcriptLower.includes("atrás") || transcriptLower.includes("back")) {
+    if (
+      transcriptLower.includes("atras") ||
+      transcriptLower.includes("atrás") ||
+      transcriptLower.includes("back")
+    ) {
       handleStepBack();
       resetTranscript();
     }
   }, [transcript, gameStarted]);
 
   const handlePointScored = (player) => {
-    setHistory((prevHistory) => [...prevHistory, structuredClone(gameState)]); // Guardar copia profunda
+    setHistory((prevHistory) => [...prevHistory, structuredClone(gameState)]);
 
     setGameState((prevState) => {
       const opponent = player === "red" ? "blue" : "red";
@@ -118,19 +127,45 @@ export const HomePage = () => {
       } else {
         newState.points[player] += 1;
       }
+
+      // Si un jugador llega a 6 sets, se guarda el resultado y termina el juego
       if (newState.sets[player] >= GAMES_TO_WIN_SET) {
-        const finalScore = `${sets.red}-${sets.blue}`;
+        const winner =
+          player === "red" ? nosotros || "Nosotros" : ellos || "Ellos";
+        const loser =
+          player === "red" ? ellos || "Ellos" : nosotros || "Nosotros";
+        const winnerPoints = newState.sets[player];
+        const loserPoints = newState.sets[opponent];
+
+        guardarResultadoEnSupabase(winner, winnerPoints, loser, loserPoints);
+
         return {
           ...newState,
           gameStarted: false,
-          lastWinner:
-            (player === "red" ? nosotros || "Nosotros" : ellos || "Ellos") +
-            " " +
-            finalScore,
+          lastWinner: `${winner} ${winnerPoints}-${loserPoints}`,
         };
       }
+
       return newState;
     });
+  };
+
+  // Función para guardar en Supabase
+  const guardarResultadoEnSupabase = async ( winner, winnerPoints, loser, loserPoints) => {
+    const { data, error } = await supabase.from("marcadordepadel").insert([
+      {
+        winner: winner,
+        winner_points: winnerPoints,
+        loser: loser,
+        loser_points: loserPoints,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error al insertar en Supabase:", error.message);
+    } else {
+      console.log("Marcador guardado en Supabase:", data);
+    }
   };
 
   const handleStepBack = () => {
@@ -317,7 +352,7 @@ export const HomePage = () => {
         <Grid.Col span={6}>
           <ScoreCard
             title={nosotros}
-						commandVoice="Nosotros"
+            commandVoice="Nosotros"
             set={sets.red}
             point={TENNIS_SCORES[points.red]}
             onPointScored={() => handlePointScored("red")}
@@ -326,7 +361,7 @@ export const HomePage = () => {
         <Grid.Col span={6}>
           <ScoreCard
             title={ellos}
-						commandVoice="Ellos"
+            commandVoice="Ellos"
             set={sets.blue}
             point={TENNIS_SCORES[points.blue]}
             onPointScored={() => handlePointScored("blue")}
@@ -334,35 +369,38 @@ export const HomePage = () => {
         </Grid.Col>
       </Grid>
 
-			<Grid>
-				<Grid.Col span={{ base: 12, xs: 4 }}>
-					<Group justify={matches ? 'flex-start' : 'center'}>
-						<Chronometer ref={chronoRef} />
-					</Group>
-				</Grid.Col>
-				<Grid.Col span={{ base: 12, xs: 8 }}>
-					<Group justify={matches ? 'flex-end' : 'center'}>
-						<Button
-							leftSection={<IconArrowBackUpDouble size={15} />}
-							variant="default"
-							onClick={handleStepBack}>
-							Atras
-						</Button>
-						<Button
-							leftSection={<IconRestore size={15} />}
-							variant="default"
-							onClick={handleGameRestart}>
-							Reset
-						</Button>
-						<Button
-							variant="light"
-							color="red"
-							onClick={() => handleGameFinished("Finalizado")}>
-							Finalizar
-						</Button>
-					</Group>
-				</Grid.Col>
-			</Grid>
+      <Grid>
+        <Grid.Col span={{ base: 12, xs: 4 }}>
+          <Group justify={matches ? "flex-start" : "center"}>
+            <Chronometer ref={chronoRef} />
+          </Group>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, xs: 8 }}>
+          <Group justify={matches ? "flex-end" : "center"}>
+            <Button
+              leftSection={<IconArrowBackUpDouble size={15} />}
+              variant="default"
+              onClick={handleStepBack}
+            >
+              Atras
+            </Button>
+            <Button
+              leftSection={<IconRestore size={15} />}
+              variant="default"
+              onClick={handleGameRestart}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="light"
+              color="red"
+              onClick={() => handleGameFinished("Finalizado")}
+            >
+              Finalizar
+            </Button>
+          </Group>
+        </Grid.Col>
+      </Grid>
     </Container>
   );
 };
