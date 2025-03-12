@@ -38,7 +38,6 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const TENNIS_SCORES = [0, 15, 30, 40, "A"];
-const GAMES_TO_WIN_SET = 6;
 const DEUCE_SCORE = 3;
 
 export const HomePage = () => {
