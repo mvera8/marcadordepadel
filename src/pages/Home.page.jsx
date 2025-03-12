@@ -103,6 +103,17 @@ export const HomePage = () => {
     }
   }, [transcript, gameStarted]);
 
+  const gamesToWinSet = (playerGames, opponentGames) => {
+    let minGamesToWin = 6;
+    while (
+      Math.abs(playerGames - opponentGames) < 2 &&
+      playerGames >= minGamesToWin
+    ) {
+      minGamesToWin++;
+    }
+    return minGamesToWin;
+  };
+
   const handlePointScored = (player) => {
     setHistory((prevHistory) => [...prevHistory, structuredClone(gameState)]);
 
@@ -112,6 +123,7 @@ export const HomePage = () => {
       const playerPoints = prevState.points[player];
       const opponentPoints = prevState.points[opponent];
 
+      // Manejo de ventaja en el DEUCE
       if (opponentPoints === DEUCE_SCORE + 1) {
         newState.points = { red: DEUCE_SCORE, blue: DEUCE_SCORE };
         return newState;
@@ -128,8 +140,17 @@ export const HomePage = () => {
         newState.points[player] += 1;
       }
 
-      // Si un jugador llega a 6 sets, se guarda el resultado y termina el juego
-      if (newState.sets[player] >= GAMES_TO_WIN_SET) {
+      // Determinar la cantidad de games necesarios para ganar
+      const gamesRequired = gamesToWinSet(
+        newState.sets[player],
+        newState.sets[opponent]
+      );
+
+      // Verificar si el jugador alcanzó los games requeridos y tiene diferencia de 2
+      if (
+        newState.sets[player] >= gamesRequired &&
+        newState.sets[player] - newState.sets[opponent] >= 2
+      ) {
         const winner =
           player === "red" ? nosotros || "Nosotros" : ellos || "Ellos";
         const loser =
@@ -151,7 +172,12 @@ export const HomePage = () => {
   };
 
   // Función para guardar en Supabase
-  const guardarResultadoEnSupabase = async ( winner, winnerPoints, loser, loserPoints) => {
+  const guardarResultadoEnSupabase = async (
+    winner,
+    winnerPoints,
+    loser,
+    loserPoints
+  ) => {
     const { data, error } = await supabase.from("marcadordepadel").insert([
       {
         winner: winner,
