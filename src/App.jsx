@@ -6,6 +6,7 @@ import { CreateTournamentPage } from "./pages/CreateTournament.page";
 import { MatchPage } from "./pages/Match.page";
 import { PlayTournamentPage } from "./pages/PlayTournament.page";
 import { Tournaments } from "./pages/Tournaments.page";
+import { TestPage } from "./pages/Test.page";
 
 import "@mantine/core/styles.css";
 
@@ -19,6 +20,12 @@ const router = createBrowserRouter([
     path: "/match",
     element: <MatchPage />,
   },
+	// Pages
+	{
+    path: "/about",
+    element: <TestPage />,
+  },
+	// Tournament
   {
     path: "/create-tournament",
     element: <CreateTournamentPage />,
@@ -27,7 +34,6 @@ const router = createBrowserRouter([
     path: "/tournament",
     element: <Tournaments />,
   },
-	,
   {
     path: "/tournament/:tournamentId",
     element: <PlayTournamentPage />,
