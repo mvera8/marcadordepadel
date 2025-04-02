@@ -4,11 +4,8 @@ import {
   ActionIcon,
   Button,
   Container,
-  Flex,
   Grid,
   Group,
-  useComputedColorScheme,
-  useMantineColorScheme,
 } from "@mantine/core";
 import SpeechRecognition, {
   useSpeechRecognition,
@@ -18,16 +15,15 @@ import {
   IconArrowsMaximize,
   IconArrowsMinimize,
   IconMicrophoneFilled,
-  IconMoon,
   IconPlayerStopFilled,
   IconRestore,
-  IconSun,
 } from "@tabler/icons-react";
 import { ScoreCard } from "../components/ScoreCard";
 import { useFullscreen, useMediaQuery } from "@mantine/hooks";
 import Chronometer from "../components/Chronometer";
 import { createClient } from "@supabase/supabase-js";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ButtonColor } from "../components/ButtonColor";
 
 const supabaseUrl = "https://qlrvithbzdncfhvjulgx.supabase.co";
 const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
@@ -45,10 +41,6 @@ export const MatchPage = () => {
   const serve = searchParams.get("serve");
 
   const matches = useMediaQuery("(min-width: 575px)");
-  const { setColorScheme } = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme("light", {
-    getInitialValueInEffect: true,
-  });
 
   const { toggle, fullscreen } = useFullscreen();
 
@@ -280,7 +272,7 @@ export const MatchPage = () => {
 
   return (
     <Container py="xs">
-      <Flex justify="flex-end" align="center" pb="xs">
+      <Group gap={5} visibleFrom="xs" justify="flex-end" pb="xs">
         <Button
           variant="subtle"
           color={listening ? "green" : "gray"}
@@ -296,23 +288,6 @@ export const MatchPage = () => {
           Comando por Voz
         </Button>
         <ActionIcon
-          ml="xs"
-          variant="subtle"
-          aria-label="Listen"
-          color="gray"
-          size="lg"
-          onClick={() =>
-            setColorScheme(computedColorScheme === "light" ? "dark" : "light")
-          }
-        >
-          {computedColorScheme === "light" ? (
-            <IconMoon size={20} />
-          ) : (
-            <IconSun size={20} />
-          )}
-        </ActionIcon>
-        <ActionIcon
-          ml="xs"
           variant="subtle"
           aria-label="Listen"
           color="gray"
@@ -325,7 +300,8 @@ export const MatchPage = () => {
             <IconArrowsMaximize size={20} />
           )}
         </ActionIcon>
-      </Flex>
+				<ButtonColor />
+      </Group>
 
       <Grid mb="md">
         <Grid.Col span={6}>

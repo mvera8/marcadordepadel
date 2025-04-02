@@ -9,6 +9,7 @@ import {
   Text,
   List,
   ThemeIcon,
+	Grid,
 } from "@mantine/core";
 import {
   IconBallTennis,
@@ -20,8 +21,11 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
+import { HeaderNavbar } from "../components/HeaderNavbar";
 
 export const CreateTournamentPage = () => {
+	const currentTime = new Date();
+	const year = currentTime.getFullYear();
   const navigate = useNavigate();
 
   // Stepper
@@ -61,7 +65,7 @@ export const CreateTournamentPage = () => {
       name: tournamentName,
       teams,
       matches,
-      createdAt: new Date().toISOString(),
+      createdAt: currentTime.toISOString(),
     };
 
     localStorage.setItem(tournamentId, JSON.stringify(tournamentData));
@@ -69,95 +73,102 @@ export const CreateTournamentPage = () => {
   };
 
   return (
-    <Container size="xs">
-      <Title order={1} ta="center" my="xl">
-        Crear Torneo de Padel
-      </Title>
+		<>
+			<HeaderNavbar />
+			<Container size="xs">
+				<Title order={1} ta="center" my="xl">
+					Crear Torneo de Padel
+				</Title>
 
-      <Stepper
-        completedIcon={<IconCheck size={18} />}
-        iconSize={42}
-        active={active}
-        onStepClick={setActive}
-      >
-        <Stepper.Step icon={<IconTrophy size={18} />}>
-          <Input.Wrapper label="Nombre del Torneo" mb="md" id="input_tournament">
-            <Input
-              placeholder="Ej: Copa Padel 2025"
-              onChange={(e) => setTournamentName(e.currentTarget.value)}
-              value={tournamentName}
-            />
-          </Input.Wrapper>
-        </Stepper.Step>
+				<Stepper
+					completedIcon={<IconCheck size={18} />}
+					iconSize={42}
+					active={active}
+					onStepClick={setActive}
+				>
+					<Stepper.Step icon={<IconTrophy size={18} />}>
+						<Input.Wrapper label="Nombre del Torneo" mb="md" id="input_tournament">
+							<Input
+								placeholder={`Ej: Copa Padel ${year}`}
+								onChange={(e) => setTournamentName(e.currentTarget.value)}
+								value={tournamentName}
+							/>
+						</Input.Wrapper>
+					</Stepper.Step>
 
-        <Stepper.Step icon={<IconUsers size={18} />}>
-          <List
-            spacing="xs"
-            size="sm"
-            mb="md"
-            icon={
-              <ThemeIcon color="teal" size={24} radius="xl">
-                <IconCircleCheck size={16} />
-              </ThemeIcon>
-            }
-          >
-            {teams.map((team, i) => (
-              <List.Item key={i}>{team}</List.Item>
-            ))}
-            {teams.length < 4 && (
-              <List.Item
-                icon={
-                  <ThemeIcon color="blue" size={24} radius="xl">
-                    <IconCircleDashed size={16} />
-                  </ThemeIcon>
-                }
-              >
-                Añadir al menos 4 parejas
-              </List.Item>
-            )}
-          </List>
+					<Stepper.Step icon={<IconUsers size={18} />}>
+						<List
+							spacing="xs"
+							size="sm"
+							mb="md"
+							icon={
+								<ThemeIcon color="teal" size={24} radius="xl">
+									<IconCircleCheck size={16} />
+								</ThemeIcon>
+							}
+						>
+							{teams.map((team, i) => (
+								<List.Item key={i}>{team}</List.Item>
+							))}
+							{teams.length < 4 && (
+								<List.Item
+									icon={
+										<ThemeIcon color="blue" size={24} radius="xl">
+											<IconCircleDashed size={16} />
+										</ThemeIcon>
+									}
+								>
+									Añadir al menos 4 parejas
+								</List.Item>
+							)}
+						</List>
 
-          <Group>
-            <Input
-              placeholder="Nombre de la pareja o equipo"
-              onChange={(e) => setTeamInput(e.currentTarget.value)}
-              value={teamInput}
-              onKeyDown={(e) => e.key === "Enter" && addTeam()}
-            />
-            <Button onClick={addTeam}>Agregar</Button>
-          </Group>
-        </Stepper.Step>
+						<Grid>
+							<Grid.Col span={9}>
+								<Input
+									placeholder="Nombre de la pareja o equipo"
+									onChange={(e) => setTeamInput(e.currentTarget.value)}
+									value={teamInput}
+									onKeyDown={(e) => e.key === "Enter" && addTeam()}
+								/>
+							</Grid.Col>
+							<Grid.Col span={3}>
+								<Button onClick={addTeam} fullWidth>Agregar</Button>
+							</Grid.Col>
+						</Grid>
+					</Stepper.Step>
 
-        <Stepper.Step icon={<IconBallTennis size={18} />}>
-          <Text mb="md">
-            ¡Listo! El torneo <strong>{tournamentName}</strong> está por comenzar con{" "}
-            {teams.length} parejas.
-          </Text>
+					<Stepper.Step icon={<IconBallTennis size={18} />}>
+						<Text mb="md">
+							¡Listo! El torneo <strong>{tournamentName}</strong> está por comenzar con{" "}
+							{teams.length} parejas.
+						</Text>
 
-          <Button
-            fullWidth
-            onClick={saveTournament}
-            disabled={teams.length < 4 || tournamentName.length < 3}
-            leftSection={<IconUserCheck size={18} />}
-          >
-            Empezar Torneo
-          </Button>
-        </Stepper.Step>
-      </Stepper>
+						<Button
+							fullWidth
+							onClick={saveTournament}
+							disabled={teams.length < 4 || tournamentName.length < 3}
+							leftSection={<IconUserCheck size={18} />}
+						>
+							Empezar Torneo
+						</Button>
+					</Stepper.Step>
+				</Stepper>
 
-      <Group justify="center" mt="xl">
-        <Button variant="default" onClick={prevStep} disabled={active === 0}>
-          Atrás
-        </Button>
-        {active < 2 && (
-          <Button
-            onClick={nextStep}
-            disabled={(active === 0 && tournamentName.length < 3) || (active === 1 && teams.length < 4)}
-          >
-            Siguiente
-          </Button>
-        )}
-      </Group>
-    </Container>
+				<Group justify="center" mt="xl">
+					<Button variant="default" onClick={prevStep} disabled={active === 0}>
+						Atrás
+					</Button>
+					{active < 2 && (
+						<Button
+							onClick={nextStep}
+							disabled={(active === 0 && tournamentName.length < 3) || (active === 1 && teams.length < 4)}
+						>
+							Siguiente
+						</Button>
+					)}
+				</Group>
+			</Container>
+		</>
   );
 };
